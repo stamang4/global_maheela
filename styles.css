@@ -3563,3 +3563,111 @@ svg {
     transform: none !important;
   }
 }
+
+/* =========================================================
+   FINAL RESPONSIVE GUTTERS + INTERACTIVE AUTO-SCROLL GALLERY
+   ========================================================= */
+
+/* Every section keeps responsive left/right breathing room.
+   Section backgrounds can still span edge-to-edge; content does not. */
+.shell {
+  width: min(1180px, calc(100% - 64px)) !important;
+  max-width: 1180px !important;
+  margin-inline: auto !important;
+  padding-inline: 0 !important;
+}
+
+@media (max-width: 900px) {
+  .shell {
+    width: calc(100% - 48px) !important;
+    max-width: none !important;
+    margin-inline: auto !important;
+    padding-inline: 0 !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .shell {
+    width: calc(100% - 36px) !important;
+    max-width: none !important;
+    margin-inline: auto !important;
+    padding-inline: 0 !important;
+  }
+}
+
+/* The gallery viewport also gets the same visual gutters while remaining
+   horizontally draggable/swipeable. */
+.community-gallery {
+  width: calc(100% - 64px) !important;
+  margin-inline: auto !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-inline: contain;
+  touch-action: pan-x pan-y !important;
+  cursor: grab;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.community-gallery::-webkit-scrollbar {
+  display: none;
+}
+
+.community-gallery.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.community-gallery-track,
+.community-gallery-track.gallery-loading,
+.community-gallery-track.gallery-ready {
+  display: flex;
+  width: max-content;
+  opacity: 1;
+  visibility: visible;
+  will-change: transform;
+}
+
+/* Keep the automatic marquee running while the viewport itself remains
+   manually scrollable by touch, mouse/trackpad, or drag JS. */
+.community-gallery-track.gallery-ready:not(.gallery-no-animation) {
+  animation: galleryMove 110s linear infinite !important;
+}
+
+@keyframes galleryMove {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+/* Do not pause simply because the pointer is over the gallery. This lets the
+   images visibly keep moving until the user's drag code explicitly pauses it. */
+.community-gallery:hover .community-gallery-track.gallery-ready:not(.gallery-no-animation) {
+  animation-play-state: running !important;
+}
+
+@media (max-width: 900px) {
+  .community-gallery {
+    width: calc(100% - 48px) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .community-gallery {
+    width: calc(100% - 36px) !important;
+  }
+
+  .community-gallery-track.gallery-ready:not(.gallery-no-animation) {
+    animation: galleryMove 85s linear infinite !important;
+  }
+}
+
+/* Accessibility: keep manual horizontal browsing available when the user has
+   explicitly requested reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .community-gallery-track.gallery-ready,
+  .community-gallery-track.gallery-ready:not(.gallery-no-animation) {
+    animation: none !important;
+    transform: none !important;
+  }
+}
