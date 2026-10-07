@@ -1,723 +1,1305 @@
 const toggle = document.querySelector('.menu-toggle');
-
 const links = document.querySelector('.nav-links');
+
 toggle?.addEventListener('click', () => {
-
   const open = toggle.getAttribute('aria-expanded') === 'true';
-  toggle.setAttribute(
 
-    'aria-expanded',
-
-    String(!open)
-
-  );
-  links?.classList.toggle(
-
-    'open',
-
-    !open
-
-  );
-
+  toggle.setAttribute('aria-expanded', String(!open));
+  links?.classList.toggle('open', !open);
 });
-document
 
-  .querySelectorAll('.nav-links a')
-
-  .forEach((a) => {
-
-    a.addEventListener('click', () => {
-
-      links?.classList.remove('open');
-      toggle?.setAttribute(
-
-        'aria-expanded',
-
-        'false'
-
-      );
-
-    });
-
+document.querySelectorAll('.nav-links a').forEach((a) => {
+  a.addEventListener('click', () => {
+    links?.classList.remove('open');
+    toggle?.setAttribute('aria-expanded', 'false');
   });
+});
+
 const reduced = window.matchMedia(
-
   '(prefers-reduced-motion: reduce)'
-
 ).matches;
-// =============================================
 
+
+// =============================================
 // REVEAL ANIMATION
-
 // =============================================
-if (
 
-  !reduced &&
-
-  'IntersectionObserver' in window
-
-) {
-
-  document.documentElement.classList.add('motion-ready');
+if (!reduced && 'IntersectionObserver' in window) {
   const io = new IntersectionObserver(
-
     (entries) => {
-
       entries.forEach((entry) => {
-
         if (entry.isIntersecting) {
-
-          entry.target.classList.add(
-
-            'visible'
-
-          );
-          io.unobserve(
-
-            entry.target
-
-          );
-
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
         }
-
       });
-
     },
-
     {
-
-      threshold: 0.02, rootMargin: "0px 0px 70px 0px"
-
+      threshold: 0.12
     }
-
   );
-  document
 
-    .querySelectorAll('.reveal')
-
-    .forEach((element) => {
-
-      io.observe(element);
-
-    });
+  document.querySelectorAll('.reveal').forEach((element) => {
+    io.observe(element);
+  });
 } else {
-  document
-
-    .querySelectorAll('.reveal')
-
-    .forEach((element) => {
-
-      element.classList.add(
-
-        'visible'
-
-      );
-
-    });
-
+  document.querySelectorAll('.reveal').forEach((element) => {
+    element.classList.add('visible');
+  });
 }
-// =============================================
 
+
+// =============================================
 // CURRENT YEAR
-
 // =============================================
-const year = document.getElementById(
 
-  'year'
+const year = document.getElementById('year');
 
-);
 if (year) {
-
-  year.textContent =
-
-    new Date().getFullYear();
-
+  year.textContent = new Date().getFullYear();
 }
-// =============================================
 
+
+// =============================================
 // MODEL CARD FLOWERS
-
 // =============================================
+
 const modelCards = [
-
-  ...document.querySelectorAll(
-
-    '.model-card'
-
-  )
-
+  ...document.querySelectorAll('.model-card')
 ];
+
 function startFlowerRain(card) {
   if (
-
     reduced ||
-
     card.querySelector('.flower-rain')
-
   ) {
-
     return;
-
   }
-  const rain =
 
-    document.createElement('div');
-  rain.className =
+  const rain = document.createElement('div');
 
-    'flower-rain';
-  rain.setAttribute(
+  rain.className = 'flower-rain';
+  rain.setAttribute('aria-hidden', 'true');
 
-    'aria-hidden',
-
-    'true'
-
-  );
   const flowers = [
-
     '✿',
-
     '❀',
-
     '✾',
-
     '❁'
-
   ];
-  for (
 
-    let i = 0;
+  for (let i = 0; i < 15; i++) {
+    const flower = document.createElement('span');
 
-    i < 7;
+    flower.className = 'falling-flower';
+    flower.textContent = flowers[i % flowers.length];
 
-    i++
-
-  ) {
-    const flower =
-
-      document.createElement('span');
-    flower.className =
-
-      'falling-flower';
-    flower.textContent =
-
-      flowers[
-
-      i % flowers.length
-
-      ];
     flower.style.left =
-
       `${4 + Math.random() * 90}%`;
+
     flower.style.fontSize =
-
       `${14 + Math.random() * 17}px`;
-    flower.style.setProperty(
 
+    flower.style.setProperty(
       '--fall-delay',
-
       `${Math.random() * 0.8}s`
-
     );
-    flower.style.setProperty(
 
+    flower.style.setProperty(
       '--fall-duration',
-
       `${2.1 + Math.random() * 1.5}s`
-
     );
+
     flower.style.setProperty(
-
       '--drift',
-
       `${-30 + Math.random() * 60}px`
-
-    );
-    rain.appendChild(
-
-      flower
-
     );
 
+    rain.appendChild(flower);
   }
-  card.appendChild(
 
-    rain
-
-  );
-
+  card.appendChild(rain);
 }
+
 function stopFlowerRain(card) {
-  card
-
-    .querySelector('.flower-rain')
-
-    ?.remove();
-
-}
-// Desktop: genuine hover. Mobile: activate the card nearest the viewport center.
-// No tap or click is required.
-const touchLayout = window.matchMedia('(hover: none), (pointer: coarse)');
-let activeModelCard = null;
-let flowerCleanupTimer = null;
-
-function activateModelCard(card) {
-  if (activeModelCard === card) return;
-  if (activeModelCard) {
-    activeModelCard.classList.remove('model-active');
-    stopFlowerRain(activeModelCard);
-  }
-  activeModelCard = card;
-  if (!card) return;
-  card.classList.add('model-active');
-  startFlowerRain(card);
-  clearTimeout(flowerCleanupTimer);
-  flowerCleanupTimer = setTimeout(() => stopFlowerRain(card), 3600);
+  card.querySelector('.flower-rain')?.remove();
 }
 
 modelCards.forEach((card) => {
-  card.addEventListener('pointerenter', (event) => {
-    if (event.pointerType === 'mouse' && !touchLayout.matches) activateModelCard(card);
-  });
-  card.addEventListener('pointerleave', (event) => {
-    if (event.pointerType === 'mouse' && !touchLayout.matches && activeModelCard === card) activateModelCard(null);
-  });
-  card.addEventListener('focusin', () => {
-    if (!touchLayout.matches) activateModelCard(card);
-  });
-  card.addEventListener('focusout', () => {
-    if (!touchLayout.matches && activeModelCard === card) activateModelCard(null);
-  });
+  card.addEventListener(
+    'mouseenter',
+    () => startFlowerRain(card)
+  );
+
+  card.addEventListener(
+    'mouseleave',
+    () => stopFlowerRain(card)
+  );
+
+  card.addEventListener(
+    'focus',
+    () => startFlowerRain(card)
+  );
+
+  card.addEventListener(
+    'blur',
+    () => stopFlowerRain(card)
+  );
 });
 
-let modelScrollPending = false;
-function updateMobileModelCard() {
-  modelScrollPending = false;
-  if (!touchLayout.matches || !modelCards.length) return;
-  const center = window.innerHeight * 0.52;
-  let nearest = null;
-  let bestDistance = Infinity;
-  modelCards.forEach((card) => {
-    const rect = card.getBoundingClientRect();
-    if (rect.bottom < window.innerHeight * 0.16 || rect.top > window.innerHeight * 0.86) return;
-    const distance = Math.abs((rect.top + rect.bottom) / 2 - center);
-    if (distance < bestDistance) { nearest = card; bestDistance = distance; }
-  });
-  activateModelCard(nearest);
-}
-function queueMobileModelUpdate() {
-  if (!modelScrollPending) {
-    modelScrollPending = true;
-    requestAnimationFrame(updateMobileModelCard);
+
+// =============================================
+// MOBILE MODEL CARD ACTIVATION
+// =============================================
+
+function updateActiveModelCard() {
+  if (
+    window.matchMedia(
+      '(hover: none), (pointer: coarse)'
+    ).matches === false
+  ) {
+    modelCards.forEach((card) => {
+      card.classList.remove('model-active');
+    });
+
+    return;
   }
+
+  const viewportCenter =
+    window.innerHeight / 2;
+
+  let closestCard = null;
+  let closestDistance = Infinity;
+
+  modelCards.forEach((card) => {
+    const rect =
+      card.getBoundingClientRect();
+
+    const cardCenter =
+      rect.top + rect.height / 2;
+
+    const distance =
+      Math.abs(
+        cardCenter - viewportCenter
+      );
+
+    if (
+      rect.bottom > 0 &&
+      rect.top < window.innerHeight &&
+      distance < closestDistance
+    ) {
+      closestDistance = distance;
+      closestCard = card;
+    }
+  });
+
+  modelCards.forEach((card) => {
+    const active =
+      card === closestCard;
+
+    card.classList.toggle(
+      'model-active',
+      active
+    );
+
+    if (active) {
+      startFlowerRain(card);
+    } else {
+      stopFlowerRain(card);
+    }
+  });
 }
-window.addEventListener('scroll', queueMobileModelUpdate, { passive: true });
-window.addEventListener('resize', queueMobileModelUpdate, { passive: true });
-touchLayout.addEventListener?.('change', () => {
-  activateModelCard(null);
-  queueMobileModelUpdate();
+
+let modelScrollFrame = null;
+
+function scheduleModelUpdate() {
+  if (modelScrollFrame) {
+    return;
+  }
+
+  modelScrollFrame =
+    requestAnimationFrame(() => {
+      updateActiveModelCard();
+      modelScrollFrame = null;
+    });
+}
+
+window.addEventListener(
+  'scroll',
+  scheduleModelUpdate,
+  {
+    passive: true
+  }
+);
+
+window.addEventListener(
+  'resize',
+  scheduleModelUpdate
+);
+
+scheduleModelUpdate();
+
+
+// =============================================
+// GET INVOLVED CARD FLOWERS
+// =============================================
+
+const involveCards = [
+  ...document.querySelectorAll('.involve-card')
+];
+
+involveCards.forEach((card) => {
+  card.addEventListener(
+    'mouseenter',
+    () => startFlowerRain(card)
+  );
+
+  card.addEventListener(
+    'mouseleave',
+    () => stopFlowerRain(card)
+  );
+
+  card.addEventListener(
+    'focusin',
+    () => startFlowerRain(card)
+  );
+
+  card.addEventListener(
+    'focusout',
+    () => stopFlowerRain(card)
+  );
 });
-queueMobileModelUpdate();
+
 
 // =============================================
+// MOBILE GET INVOLVED ACTIVATION
+// =============================================
 
+function updateActiveInvolveCard() {
+  if (
+    window.matchMedia(
+      '(hover: none), (pointer: coarse)'
+    ).matches === false
+  ) {
+    involveCards.forEach((card) => {
+      card.classList.remove('involve-active');
+    });
+
+    return;
+  }
+
+  const viewportCenter =
+    window.innerHeight / 2;
+
+  let closestCard = null;
+  let closestDistance = Infinity;
+
+  involveCards.forEach((card) => {
+    const rect =
+      card.getBoundingClientRect();
+
+    const cardCenter =
+      rect.top + rect.height / 2;
+
+    const distance =
+      Math.abs(
+        cardCenter - viewportCenter
+      );
+
+    if (
+      rect.bottom > 0 &&
+      rect.top < window.innerHeight &&
+      distance < closestDistance
+    ) {
+      closestDistance = distance;
+      closestCard = card;
+    }
+  });
+
+  involveCards.forEach((card) => {
+    const active =
+      card === closestCard;
+
+    card.classList.toggle(
+      'involve-active',
+      active
+    );
+
+    if (active) {
+      startFlowerRain(card);
+    } else {
+      stopFlowerRain(card);
+    }
+  });
+}
+
+let involveScrollFrame = null;
+
+function scheduleInvolveUpdate() {
+  if (involveScrollFrame) {
+    return;
+  }
+
+  involveScrollFrame =
+    requestAnimationFrame(() => {
+      updateActiveInvolveCard();
+      involveScrollFrame = null;
+    });
+}
+
+window.addEventListener(
+  'scroll',
+  scheduleInvolveUpdate,
+  {
+    passive: true
+  }
+);
+
+window.addEventListener(
+  'resize',
+  scheduleInvolveUpdate
+);
+
+scheduleInvolveUpdate();
+
+
+// =============================================
 // BACK TO TOP
-
 // =============================================
+
 document
-
   .querySelector('.back-to-top')
-
   ?.addEventListener('click', () => {
     window.scrollTo({
-
       top: 0,
-
       left: 0,
-
       behavior:
-
         reduced
-
           ? 'auto'
-
           : 'smooth'
-
     });
   });
-// =============================================
 
+
+// =============================================
 // IMPACT NUMBER
-
 // =============================================
+
 const impactStat =
+  document.querySelector('.impact-stat');
 
-  document.querySelector(
-
-    '.impact-stat'
-
-  );
 if (impactStat) {
   const number =
-
     impactStat.querySelector(
-
       '.impact-number'
-
     );
+
   const target =
-
     Number(
-
       impactStat.dataset.count || 11
-
     );
+
   if (
-
     reduced ||
-
     !('IntersectionObserver' in window)
-
   ) {
     if (number) {
-
-      number.textContent =
-
-        target;
-
+      number.textContent = target;
     }
   } else {
     const countObserver =
-
       new IntersectionObserver(
-
         ([entry]) => {
           if (
-
             !entry.isIntersecting ||
-
             !number
-
           ) {
-
             return;
-
           }
+
           const start =
-
             performance.now();
-          const duration =
 
-            1100;
-          const tick =
+          const duration = 1100;
 
-            (now) => {
-              const progress =
+          const tick = (now) => {
+            const progress =
+              Math.min(
+                (now - start) /
+                duration,
+                1
+              );
 
-                Math.min(
+            const eased =
+              1 -
+              Math.pow(
+                1 - progress,
+                3
+              );
 
-                  (now - start) /
+            number.textContent =
+              Math.max(
+                1,
+                Math.round(
+                  target * eased
+                )
+              );
 
-                  duration,
+            if (progress < 1) {
+              requestAnimationFrame(
+                tick
+              );
+            }
+          };
 
-                  1
-
-                );
-              const eased =
-
-                1 -
-
-                Math.pow(
-
-                  1 - progress,
-
-                  3
-
-                );
-              number.textContent =
-
-                Math.max(
-
-                  1,
-
-                  Math.round(
-
-                    target * eased
-
-                  )
-
-                );
-              if (progress < 1) {
-
-                requestAnimationFrame(
-
-                  tick
-
-                );
-
-              }
-
-            };
-          requestAnimationFrame(
-
-            tick
-
-          );
+          requestAnimationFrame(tick);
           countObserver.disconnect();
-
         },
-
         {
-
           threshold: 0.45
-
         }
-
       );
+
     countObserver.observe(
-
       impactStat
-
     );
-
   }
-
 }
+
+
 // =============================================
-// COMMUNITY GALLERY — progressive and mobile-friendly
+// COMMUNITY GALLERY
 // =============================================
-const galleryTrack = document.getElementById('community-gallery-track');
-const gallerySection = document.getElementById('community-gallery');
-const lightbox = document.getElementById('gallery-lightbox');
-const lightboxImage = document.getElementById('gallery-lightbox-image');
-const lightboxCounter = document.getElementById('gallery-lightbox-counter');
-const lightboxClose = document.getElementById('gallery-lightbox-close');
-const lightboxPrevious = document.getElementById('gallery-lightbox-prev');
-const lightboxNext = document.getElementById('gallery-lightbox-next');
-const galleryImages = Array.isArray(window.communityImages) ? window.communityImages : [];
-const galleryEntries = galleryImages.map((item) =>
-  typeof item === 'string' ? { thumb: item, full: item } : item
-).filter((item) => item && item.thumb && item.full);
+
+const galleryTrack =
+  document.getElementById(
+    'community-gallery-track'
+  );
+
+const galleryScroller =
+  document.querySelector(
+    '.community-gallery'
+  );
+
+const lightbox =
+  document.getElementById(
+    'gallery-lightbox'
+  );
+
+const lightboxImage =
+  document.getElementById(
+    'gallery-lightbox-image'
+  );
+
+const lightboxCounter =
+  document.getElementById(
+    'gallery-lightbox-counter'
+  );
+
+const lightboxClose =
+  document.getElementById(
+    'gallery-lightbox-close'
+  );
+
+const lightboxPrevious =
+  document.getElementById(
+    'gallery-lightbox-prev'
+  );
+
+const lightboxNext =
+  document.getElementById(
+    'gallery-lightbox-next'
+  );
+
+const galleryImages =
+  Array.isArray(window.communityImages)
+    ? window.communityImages
+    : [];
+
 let currentGalleryIndex = 0;
 let lastGalleryFocus = null;
-let galleryInitialized = false;
-let suppressGalleryClickUntil = 0;
 
-function createGalleryItem(entry, index, duplicate = false) {
-  const button = document.createElement('button');
+
+// =============================================
+// CREATE GALLERY ITEM
+// =============================================
+
+function createGalleryItem(
+  imagePath,
+  index,
+  duplicate = false
+) {
+  const button =
+    document.createElement('button');
+
   button.type = 'button';
-  button.className = 'community-gallery-item';
-  button.setAttribute('aria-label', `View community photo ${index + 1}`);
+  button.className =
+    'community-gallery-item';
+
   if (duplicate) {
     button.tabIndex = -1;
-    button.setAttribute('aria-hidden', 'true');
+
+    button.setAttribute(
+      'aria-hidden',
+      'true'
+    );
+  } else {
+    button.setAttribute(
+      'aria-label',
+      `View community photo ${index + 1}`
+    );
   }
-  const img = document.createElement('img');
-  img.src = entry.thumb;
-  img.alt = duplicate ? '' : `Global Maheela community photo ${index + 1}`;
-  img.loading = 'lazy';
-  img.decoding = 'async';
-  img.width = 420;
-  img.height = 320;
-  button.append(img);
-  button.addEventListener('click', () => {
-    if (performance.now() < suppressGalleryClickUntil) return;
-    openGallery(index, button);
-  });
+
+  const image =
+    document.createElement('img');
+
+  image.src = imagePath;
+
+  image.alt =
+    duplicate
+      ? ''
+      : `Global Maheela community photo ${index + 1}`;
+
+  image.loading = 'eager';
+  image.decoding = 'async';
+
+  button.appendChild(image);
+
+  if (!duplicate) {
+    button.addEventListener(
+      'click',
+      () => {
+        openGallery(
+          index,
+          button
+        );
+      }
+    );
+  }
+
   return button;
 }
 
-function initializeGallery() {
-  if (!galleryTrack || galleryInitialized) return;
-  galleryInitialized = true;
-  if (!galleryEntries.length) {
-    galleryTrack.textContent = 'Community photos coming soon.';
-    galleryTrack.classList.add('gallery-ready', 'gallery-no-animation');
+
+// =============================================
+// BUILD GALLERY
+// =============================================
+
+function buildGallery() {
+  if (!galleryTrack) {
     return;
   }
-  // Keep the marquee lightweight: the lightbox still navigates ALL images.
-  const featured = galleryEntries.slice(0, 12);
-  const fragment = document.createDocumentFragment();
-  featured.forEach((entry, i) => fragment.append(createGalleryItem(entry, i)));
-  if (featured.length > 1) {
-    featured.forEach((entry, i) => fragment.append(createGalleryItem(entry, i, true)));
+
+  galleryTrack.innerHTML = '';
+
+  galleryTrack.classList.remove(
+    'gallery-ready',
+    'gallery-no-animation'
+  );
+
+  if (galleryImages.length === 0) {
+    const message =
+      document.createElement('p');
+
+    message.className =
+      'gallery-empty';
+
+    message.textContent =
+      'No community photos found.';
+
+    galleryTrack.appendChild(
+      message
+    );
+
+    galleryTrack.classList.add(
+      'gallery-ready',
+      'gallery-no-animation'
+    );
+
+    return;
+  }
+
+  // First copy of all images.
+  galleryImages.forEach(
+    (imagePath, index) => {
+      galleryTrack.appendChild(
+        createGalleryItem(
+          imagePath,
+          index,
+          false
+        )
+      );
+    }
+  );
+
+  /*
+    Add a second identical copy.
+
+    The duplicate set allows the
+    JavaScript auto-scroll to loop
+    without a visible jump.
+  */
+  if (
+    !reduced &&
+    galleryImages.length > 1
+  ) {
+    galleryImages.forEach(
+      (imagePath, index) => {
+        galleryTrack.appendChild(
+          createGalleryItem(
+            imagePath,
+            index,
+            true
+          )
+        );
+      }
+    );
   } else {
-    galleryTrack.classList.add('gallery-no-animation');
+    galleryTrack.classList.add(
+      'gallery-no-animation'
+    );
   }
-  galleryTrack.append(fragment);
-  galleryTrack.classList.add('gallery-ready');
-  startGalleryMotion();
 }
 
-function updateGalleryLightbox() {
-  if (!lightboxImage || !galleryEntries.length) return;
-  lightboxImage.src = galleryEntries[currentGalleryIndex].full;
-  lightboxImage.alt = `Global Maheela community photo ${currentGalleryIndex + 1}`;
-  if (lightboxCounter) lightboxCounter.textContent = `${currentGalleryIndex + 1} / ${galleryEntries.length}`;
-}
-function openGallery(index, trigger) {
-  if (!lightbox || !lightboxImage || !galleryEntries.length) return;
-  currentGalleryIndex = index;
-  lastGalleryFocus = trigger;
-  updateGalleryLightbox();
-  lightbox.classList.add('open');
-  lightbox.setAttribute('aria-hidden', 'false');
-  document.body.classList.add('gallery-open');
-  lightboxClose?.focus();
-}
-function nextGalleryImage() {
-  if (!galleryEntries.length) return;
-  currentGalleryIndex = (currentGalleryIndex + 1) % galleryEntries.length;
-  updateGalleryLightbox();
-}
-function previousGalleryImage() {
-  if (!galleryEntries.length) return;
-  currentGalleryIndex = (currentGalleryIndex - 1 + galleryEntries.length) % galleryEntries.length;
-  updateGalleryLightbox();
-}
-function closeGallery() {
-  if (!lightbox) return;
-  lightbox.classList.remove('open');
-  lightbox.setAttribute('aria-hidden', 'true');
-  document.body.classList.remove('gallery-open');
-  lightboxImage?.removeAttribute('src');
-  lastGalleryFocus?.focus();
-}
-lightboxClose?.addEventListener('click', closeGallery);
-lightboxPrevious?.addEventListener('click', previousGalleryImage);
-lightboxNext?.addEventListener('click', nextGalleryImage);
-lightbox?.addEventListener('click', (event) => {
-  if (event.target === lightbox) closeGallery();
-});
-document.addEventListener('keydown', (event) => {
-  if (!lightbox?.classList.contains('open')) return;
-  if (event.key === 'Escape') closeGallery();
-  if (event.key === 'ArrowRight') nextGalleryImage();
-  if (event.key === 'ArrowLeft') previousGalleryImage();
-  if (event.key === 'Tab') {
-    const controls = [lightboxClose, lightboxPrevious, lightboxNext].filter(Boolean);
-    const first = controls[0], last = controls[controls.length - 1];
-    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
-  }
-});
-let touchStartX = null;
-lightbox?.addEventListener('touchstart', (event) => {
-  touchStartX = event.changedTouches[0]?.screenX ?? null;
-}, { passive: true });
-lightbox?.addEventListener('touchend', (event) => {
-  if (touchStartX === null) return;
-  const delta = (event.changedTouches[0]?.screenX ?? touchStartX) - touchStartX;
-  touchStartX = null;
-  if (Math.abs(delta) < 50) return;
-  if (delta < 0) nextGalleryImage(); else previousGalleryImage();
-}, { passive: true });
-if (galleryTrack) {
-  if ('IntersectionObserver' in window && gallerySection) {
-    const galleryObserver = new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) {
-        initializeGallery();
-        galleryObserver.disconnect();
-      }
-    }, { rootMargin: '450px 0px' });
-    galleryObserver.observe(gallerySection);
-  } else initializeGallery();
+
+// =============================================
+// PRELOAD GALLERY IMAGES
+// =============================================
+
+function preloadImage(src) {
+  return new Promise(
+    (resolve) => {
+      const image = new Image();
+
+      image.onload =
+        () => resolve({
+          src,
+          loaded: true
+        });
+
+      image.onerror =
+        () => resolve({
+          src,
+          loaded: false
+        });
+
+      image.src = src;
+    }
+  );
 }
 
-// Continuously scroll the actual gallery viewport, so users can swipe/drag
-// in either direction while the gallery still moves on its own.
-function startGalleryMotion() {
-  if (!gallerySection || !galleryTrack || galleryEntries.length < 2) return;
-  const gallery = gallerySection;
-  let pausedUntil = 0;
-  let dragging = false;
-  let pointerStartX = 0;
-  let scrollStart = 0;
-  let movedWhileDragging = false;
-  let lastTime = 0;
-  let frame = 0;
-  let visible = true;
-  const speed = 19; // pixels per second: gentle automatic movement
-  const pause = () => { pausedUntil = performance.now() + 2300; };
-  gallery.addEventListener('pointerdown', (event) => {
-    pause();
-    if (event.pointerType === 'mouse' && event.button === 0) {
-      dragging = true;
-      movedWhileDragging = false;
-      pointerStartX = event.clientX;
-      scrollStart = gallery.scrollLeft;
-      gallery.classList.add('is-dragging');
+async function preloadGalleryImages() {
+  if (!galleryTrack) {
+    return;
+  }
+
+  galleryTrack.classList.add(
+    'gallery-loading'
+  );
+
+  if (galleryImages.length === 0) {
+    buildGallery();
+
+    galleryTrack.classList.remove(
+      'gallery-loading'
+    );
+
+    galleryTrack.classList.add(
+      'gallery-ready'
+    );
+
+    return;
+  }
+
+  const results =
+    await Promise.all(
+      galleryImages.map(
+        (src) =>
+          preloadImage(src)
+      )
+    );
+
+  results.forEach((result) => {
+    if (!result.loaded) {
+      console.warn(
+        'Community image failed to load:',
+        result.src
+      );
     }
   });
-  window.addEventListener('pointermove', (event) => {
-    if (!dragging) return;
-    if (Math.abs(event.clientX - pointerStartX) > 7) movedWhileDragging = true;
-    if (movedWhileDragging) gallery.scrollLeft = scrollStart - (event.clientX - pointerStartX);
-    pause();
+
+  buildGallery();
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      galleryTrack.classList.remove(
+        'gallery-loading'
+      );
+
+      galleryTrack.classList.add(
+        'gallery-ready'
+      );
+
+      startGalleryAutoScroll();
+    });
   });
-  const stopDragging = () => { if (dragging && movedWhileDragging) suppressGalleryClickUntil = performance.now() + 250; dragging = false; movedWhileDragging = false; gallery.classList.remove('is-dragging'); };
-  window.addEventListener('pointerup', stopDragging);
-  window.addEventListener('pointercancel', stopDragging);
-  gallery.addEventListener('touchstart', pause, { passive: true });
-  gallery.addEventListener('touchmove', pause, { passive: true });
-  gallery.addEventListener('wheel', pause, { passive: true });
-  gallery.addEventListener('mouseenter', pause);
-  gallery.addEventListener('focusin', pause);
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; }, { threshold: 0 }).observe(gallery);
-  }
-  const tick = (time) => {
-    const delta = lastTime ? Math.min((time - lastTime) / 1000, .05) : 0;
-    lastTime = time;
-    if (!reduced && visible && !dragging && time > pausedUntil && !lightbox?.classList.contains('open')) {
-      const half = galleryTrack.scrollWidth / 2;
-      if (half > 0) {
-        gallery.scrollLeft += speed * delta;
-        if (gallery.scrollLeft >= half) gallery.scrollLeft -= half;
-      }
-    }
-    frame = requestAnimationFrame(tick);
-  };
-  frame = requestAnimationFrame(tick);
-  window.addEventListener('pagehide', () => cancelAnimationFrame(frame), { once: true });
 }
 
-// Email is assembled only when a visitor presses the contact button.
-// This avoids displaying a plain-text address in the page markup.
-document.getElementById('email-global-maheela')?.addEventListener('click', () => {
-  const address = ['globalmaheela', 'gmail.com'].join('@');
-  const subject = encodeURIComponent('Connecting with Global Maheela');
-  window.location.href = `mailto:${address}?subject=${subject}`;
-});
 
-// Get Involved: touch devices have no hover. Highlight the card closest
-// to the center of the visible screen, without requiring a tap.
-(() => {
-  const cards = [...document.querySelectorAll('.involve-card')];
-  if (!cards.length) return;
-  const touch = window.matchMedia('(hover: none), (pointer: coarse)');
-  let scheduled = false;
-  const update = () => {
-    scheduled = false;
-    if (!touch.matches) {
-      cards.forEach(card => card.classList.remove('is-scroll-active'));
+// =============================================
+// GALLERY AUTO SCROLL
+// =============================================
+
+let galleryAnimationFrame = null;
+
+let galleryLastTimestamp = null;
+
+let galleryInteractionPaused = false;
+
+let galleryResumeTimer = null;
+
+const GALLERY_SPEED = 32;
+
+
+function getGalleryLoopWidth() {
+  if (!galleryTrack) {
+    return 0;
+  }
+
+  /*
+    There are two identical sets of
+    images in the track, so half the
+    total track width is one complete
+    gallery set.
+  */
+  return galleryTrack.scrollWidth / 2;
+}
+
+
+function galleryAutoScrollStep(
+  timestamp
+) {
+  if (
+    !galleryScroller ||
+    !galleryTrack ||
+    reduced ||
+    galleryImages.length < 2
+  ) {
+    galleryAnimationFrame = null;
+    return;
+  }
+
+  if (galleryLastTimestamp === null) {
+    galleryLastTimestamp = timestamp;
+  }
+
+  const elapsed =
+    Math.min(
+      timestamp -
+        galleryLastTimestamp,
+      50
+    );
+
+  galleryLastTimestamp =
+    timestamp;
+
+  if (!galleryInteractionPaused) {
+    const pixels =
+      GALLERY_SPEED *
+      (elapsed / 1000);
+
+    galleryScroller.scrollLeft +=
+      pixels;
+
+    const loopWidth =
+      getGalleryLoopWidth();
+
+    if (
+      loopWidth > 0 &&
+      galleryScroller.scrollLeft >=
+        loopWidth
+    ) {
+      galleryScroller.scrollLeft -=
+        loopWidth;
+    }
+  }
+
+  galleryAnimationFrame =
+    requestAnimationFrame(
+      galleryAutoScrollStep
+    );
+}
+
+
+function startGalleryAutoScroll() {
+  if (
+    reduced ||
+    !galleryScroller ||
+    !galleryTrack ||
+    galleryImages.length < 2
+  ) {
+    return;
+  }
+
+  if (galleryAnimationFrame) {
+    cancelAnimationFrame(
+      galleryAnimationFrame
+    );
+  }
+
+  galleryLastTimestamp = null;
+
+  galleryAnimationFrame =
+    requestAnimationFrame(
+      galleryAutoScrollStep
+    );
+}
+
+
+function pauseGalleryAutoScroll() {
+  galleryInteractionPaused = true;
+
+  if (galleryResumeTimer) {
+    clearTimeout(
+      galleryResumeTimer
+    );
+
+    galleryResumeTimer = null;
+  }
+}
+
+
+function resumeGalleryAutoScroll(
+  delay = 700
+) {
+  if (reduced) {
+    return;
+  }
+
+  if (galleryResumeTimer) {
+    clearTimeout(
+      galleryResumeTimer
+    );
+  }
+
+  galleryResumeTimer =
+    setTimeout(() => {
+      galleryInteractionPaused =
+        false;
+
+      galleryLastTimestamp =
+        null;
+    }, delay);
+}
+
+
+// =============================================
+// GALLERY TOUCH / POINTER INTERACTION
+// =============================================
+
+galleryScroller?.addEventListener(
+  'pointerdown',
+  () => {
+    pauseGalleryAutoScroll();
+
+    galleryScroller.classList.add(
+      'is-dragging'
+    );
+  }
+);
+
+galleryScroller?.addEventListener(
+  'pointerup',
+  () => {
+    galleryScroller.classList.remove(
+      'is-dragging'
+    );
+
+    resumeGalleryAutoScroll();
+  }
+);
+
+galleryScroller?.addEventListener(
+  'pointercancel',
+  () => {
+    galleryScroller.classList.remove(
+      'is-dragging'
+    );
+
+    resumeGalleryAutoScroll();
+  }
+);
+
+galleryScroller?.addEventListener(
+  'pointerleave',
+  () => {
+    galleryScroller.classList.remove(
+      'is-dragging'
+    );
+
+    resumeGalleryAutoScroll();
+  }
+);
+
+galleryScroller?.addEventListener(
+  'touchstart',
+  pauseGalleryAutoScroll,
+  {
+    passive: true
+  }
+);
+
+galleryScroller?.addEventListener(
+  'touchend',
+  () => {
+    resumeGalleryAutoScroll();
+  },
+  {
+    passive: true
+  }
+);
+
+galleryScroller?.addEventListener(
+  'wheel',
+  () => {
+    pauseGalleryAutoScroll();
+    resumeGalleryAutoScroll(1000);
+  },
+  {
+    passive: true
+  }
+);
+
+
+// =============================================
+// DESKTOP CLICK + DRAG
+// =============================================
+
+let galleryDragging = false;
+
+let galleryDragStartX = 0;
+
+let galleryDragStartScroll = 0;
+
+let galleryDraggedDistance = 0;
+
+
+galleryScroller?.addEventListener(
+  'mousedown',
+  (event) => {
+    galleryDragging = true;
+
+    galleryDragStartX =
+      event.clientX;
+
+    galleryDragStartScroll =
+      galleryScroller.scrollLeft;
+
+    galleryDraggedDistance = 0;
+
+    pauseGalleryAutoScroll();
+
+    galleryScroller.classList.add(
+      'is-dragging'
+    );
+  }
+);
+
+
+window.addEventListener(
+  'mousemove',
+  (event) => {
+    if (
+      !galleryDragging ||
+      !galleryScroller
+    ) {
       return;
     }
-    const center = window.innerHeight / 2;
-    let best = null;
-    let distance = Infinity;
-    cards.forEach(card => {
-      const rect = card.getBoundingClientRect();
-      if (rect.bottom < window.innerHeight * .15 || rect.top > window.innerHeight * .85) return;
-      const d = Math.abs((rect.top + rect.bottom) / 2 - center);
-      if (d < distance) { distance = d; best = card; }
-    });
-    cards.forEach(card => card.classList.toggle('is-scroll-active', card === best));
-  };
-  const schedule = () => {
-    if (!scheduled) { scheduled = true; requestAnimationFrame(update); }
-  };
-  window.addEventListener('scroll', schedule, { passive: true });
-  window.addEventListener('resize', schedule, { passive: true });
-  touch.addEventListener?.('change', schedule);
-  schedule();
-})();
+
+    const distance =
+      event.clientX -
+      galleryDragStartX;
+
+    galleryDraggedDistance =
+      Math.max(
+        galleryDraggedDistance,
+        Math.abs(distance)
+      );
+
+    galleryScroller.scrollLeft =
+      galleryDragStartScroll -
+      distance;
+  }
+);
+
+
+window.addEventListener(
+  'mouseup',
+  () => {
+    if (!galleryDragging) {
+      return;
+    }
+
+    galleryDragging = false;
+
+    galleryScroller?.classList.remove(
+      'is-dragging'
+    );
+
+    resumeGalleryAutoScroll();
+  }
+);
+
+
+// Prevent accidental lightbox opening
+// after dragging the gallery.
+galleryTrack?.addEventListener(
+  'click',
+  (event) => {
+    if (galleryDraggedDistance > 8) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      galleryDraggedDistance = 0;
+    }
+  },
+  true
+);
+
+
+// =============================================
+// OPEN PHOTO
+// =============================================
+
+function openGallery(
+  index,
+  trigger
+) {
+  if (
+    !lightbox ||
+    !lightboxImage ||
+    galleryImages.length === 0
+  ) {
+    return;
+  }
+
+  currentGalleryIndex = index;
+  lastGalleryFocus = trigger;
+
+  updateGalleryLightbox();
+
+  lightbox.classList.add('open');
+
+  lightbox.setAttribute(
+    'aria-hidden',
+    'false'
+  );
+
+  document.body.classList.add(
+    'gallery-open'
+  );
+
+  pauseGalleryAutoScroll();
+
+  lightboxClose?.focus();
+}
+
+
+// =============================================
+// UPDATE LARGE PHOTO
+// =============================================
+
+function updateGalleryLightbox() {
+  if (
+    !lightboxImage ||
+    galleryImages.length === 0
+  ) {
+    return;
+  }
+
+  lightboxImage.src =
+    galleryImages[
+      currentGalleryIndex
+    ];
+
+  lightboxImage.alt =
+    `Global Maheela community photo ${
+      currentGalleryIndex + 1
+    }`;
+
+  if (lightboxCounter) {
+    lightboxCounter.textContent =
+      `${currentGalleryIndex + 1} / ${
+        galleryImages.length
+      }`;
+  }
+}
+
+
+// =============================================
+// NEXT PHOTO
+// =============================================
+
+function nextGalleryImage() {
+  if (galleryImages.length === 0) {
+    return;
+  }
+
+  currentGalleryIndex =
+    (
+      currentGalleryIndex + 1
+    ) %
+    galleryImages.length;
+
+  updateGalleryLightbox();
+}
+
+
+// =============================================
+// PREVIOUS PHOTO
+// =============================================
+
+function previousGalleryImage() {
+  if (galleryImages.length === 0) {
+    return;
+  }
+
+  currentGalleryIndex =
+    (
+      currentGalleryIndex -
+      1 +
+      galleryImages.length
+    ) %
+    galleryImages.length;
+
+  updateGalleryLightbox();
+}
+
+
+// =============================================
+// CLOSE PHOTO VIEWER
+// =============================================
+
+function closeGallery() {
+  if (!lightbox) {
+    return;
+  }
+
+  lightbox.classList.remove('open');
+
+  lightbox.setAttribute(
+    'aria-hidden',
+    'true'
+  );
+
+  document.body.classList.remove(
+    'gallery-open'
+  );
+
+  if (lightboxImage) {
+    lightboxImage.src = '';
+  }
+
+  if (
+    lastGalleryFocus instanceof
+      HTMLElement
+  ) {
+    lastGalleryFocus.focus();
+  }
+
+  resumeGalleryAutoScroll(300);
+}
+
+
+// =============================================
+// LIGHTBOX BUTTONS
+// =============================================
+
+lightboxClose?.addEventListener(
+  'click',
+  closeGallery
+);
+
+lightboxPrevious?.addEventListener(
+  'click',
+  previousGalleryImage
+);
+
+lightboxNext?.addEventListener(
+  'click',
+  nextGalleryImage
+);
+
+
+// =============================================
+// CLICK BACKGROUND TO CLOSE
+// =============================================
+
+lightbox?.addEventListener(
+  'click',
+  (event) => {
+    if (event.target === lightbox) {
+      closeGallery();
+    }
+  }
+);
+
+
+// =============================================
+// KEYBOARD CONTROLS
+// =============================================
+
+document.addEventListener(
+  'keydown',
+  (event) => {
+    if (
+      !lightbox?.classList.contains(
+        'open'
+      )
+    ) {
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      closeGallery();
+    }
+
+    if (event.key === 'ArrowRight') {
+      nextGalleryImage();
+    }
+
+    if (event.key === 'ArrowLeft') {
+      previousGalleryImage();
+    }
+  }
+);
+
+
+// =============================================
+// EMAIL BUTTON
+// =============================================
+
+const emailButton =
+  document.getElementById(
+    'email-global-maheela'
+  );
+
+emailButton?.addEventListener(
+  'click',
+  (event) => {
+    event.preventDefault();
+
+    const user = 'globalmaheela';
+    const domain = 'gmail.com';
+
+    window.location.href =
+      `mailto:${user}@${domain}`;
+  }
+);
+
+
+// =============================================
+// START GALLERY
+// =============================================
+
+preloadGalleryImages();
