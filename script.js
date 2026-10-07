@@ -4,16 +4,34 @@ const links = document.querySelector('.nav-links');
 toggle?.addEventListener('click', () => {
   const open = toggle.getAttribute('aria-expanded') === 'true';
 
-  toggle.setAttribute('aria-expanded', String(!open));
-  links?.classList.toggle('open', !open);
+  toggle.setAttribute(
+    'aria-expanded',
+    String(!open)
+  );
+
+  links?.classList.toggle(
+    'open',
+    !open
+  );
 });
 
-document.querySelectorAll('.nav-links a').forEach((a) => {
-  a.addEventListener('click', () => {
-    links?.classList.remove('open');
-    toggle?.setAttribute('aria-expanded', 'false');
+document
+  .querySelectorAll('.nav-links a')
+  .forEach((a) => {
+    a.addEventListener('click', () => {
+      links?.classList.remove('open');
+
+      toggle?.setAttribute(
+        'aria-expanded',
+        'false'
+      );
+    });
   });
-});
+
+
+// =============================================
+// REDUCED MOTION
+// =============================================
 
 const reduced = window.matchMedia(
   '(prefers-reduced-motion: reduce)'
@@ -24,13 +42,21 @@ const reduced = window.matchMedia(
 // REVEAL ANIMATION
 // =============================================
 
-if (!reduced && 'IntersectionObserver' in window) {
+if (
+  !reduced &&
+  'IntersectionObserver' in window
+) {
   const io = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          io.unobserve(entry.target);
+          entry.target.classList.add(
+            'visible'
+          );
+
+          io.unobserve(
+            entry.target
+          );
         }
       });
     },
@@ -39,13 +65,21 @@ if (!reduced && 'IntersectionObserver' in window) {
     }
   );
 
-  document.querySelectorAll('.reveal').forEach((element) => {
-    io.observe(element);
-  });
+  document
+    .querySelectorAll('.reveal')
+    .forEach((element) => {
+      io.observe(element);
+    });
+
 } else {
-  document.querySelectorAll('.reveal').forEach((element) => {
-    element.classList.add('visible');
-  });
+
+  document
+    .querySelectorAll('.reveal')
+    .forEach((element) => {
+      element.classList.add(
+        'visible'
+      );
+    });
 }
 
 
@@ -53,22 +87,21 @@ if (!reduced && 'IntersectionObserver' in window) {
 // CURRENT YEAR
 // =============================================
 
-const year = document.getElementById('year');
+const year =
+  document.getElementById('year');
 
 if (year) {
-  year.textContent = new Date().getFullYear();
+  year.textContent =
+    new Date().getFullYear();
 }
 
 
 // =============================================
-// MODEL CARD FLOWERS
+// FLOWER EFFECT
 // =============================================
 
-const modelCards = [
-  ...document.querySelectorAll('.model-card')
-];
-
 function startFlowerRain(card) {
+
   if (
     reduced ||
     card.querySelector('.flower-rain')
@@ -76,10 +109,16 @@ function startFlowerRain(card) {
     return;
   }
 
-  const rain = document.createElement('div');
+  const rain =
+    document.createElement('div');
 
-  rain.className = 'flower-rain';
-  rain.setAttribute('aria-hidden', 'true');
+  rain.className =
+    'flower-rain';
+
+  rain.setAttribute(
+    'aria-hidden',
+    'true'
+  );
 
   const flowers = [
     '✿',
@@ -88,11 +127,22 @@ function startFlowerRain(card) {
     '❁'
   ];
 
-  for (let i = 0; i < 15; i++) {
-    const flower = document.createElement('span');
+  for (
+    let i = 0;
+    i < 15;
+    i++
+  ) {
 
-    flower.className = 'falling-flower';
-    flower.textContent = flowers[i % flowers.length];
+    const flower =
+      document.createElement('span');
+
+    flower.className =
+      'falling-flower';
+
+    flower.textContent =
+      flowers[
+        i % flowers.length
+      ];
 
     flower.style.left =
       `${4 + Math.random() * 90}%`;
@@ -115,17 +165,38 @@ function startFlowerRain(card) {
       `${-30 + Math.random() * 60}px`
     );
 
-    rain.appendChild(flower);
+    rain.appendChild(
+      flower
+    );
   }
 
-  card.appendChild(rain);
+  card.appendChild(
+    rain
+  );
 }
+
 
 function stopFlowerRain(card) {
-  card.querySelector('.flower-rain')?.remove();
+
+  card
+    .querySelector('.flower-rain')
+    ?.remove();
 }
 
+
+// =============================================
+// MODEL CARDS
+// =============================================
+
+const modelCards = [
+  ...document.querySelectorAll(
+    '.model-card'
+  )
+];
+
+
 modelCards.forEach((card) => {
+
   card.addEventListener(
     'mouseenter',
     () => startFlowerRain(card)
@@ -145,6 +216,7 @@ modelCards.forEach((card) => {
     'blur',
     () => stopFlowerRain(card)
   );
+
 });
 
 
@@ -153,13 +225,18 @@ modelCards.forEach((card) => {
 // =============================================
 
 function updateActiveModelCard() {
-  if (
+
+  const mobileInteraction =
     window.matchMedia(
       '(hover: none), (pointer: coarse)'
-    ).matches === false
-  ) {
+    ).matches;
+
+  if (!mobileInteraction) {
+
     modelCards.forEach((card) => {
-      card.classList.remove('model-active');
+      card.classList.remove(
+        'model-active'
+      );
     });
 
     return;
@@ -172,28 +249,38 @@ function updateActiveModelCard() {
   let closestDistance = Infinity;
 
   modelCards.forEach((card) => {
+
     const rect =
       card.getBoundingClientRect();
 
     const cardCenter =
-      rect.top + rect.height / 2;
+      rect.top +
+      rect.height / 2;
 
     const distance =
       Math.abs(
-        cardCenter - viewportCenter
+        cardCenter -
+        viewportCenter
       );
 
     if (
       rect.bottom > 0 &&
-      rect.top < window.innerHeight &&
-      distance < closestDistance
+      rect.top <
+        window.innerHeight &&
+      distance <
+        closestDistance
     ) {
-      closestDistance = distance;
-      closestCard = card;
+
+      closestDistance =
+        distance;
+
+      closestCard =
+        card;
     }
   });
 
   modelCards.forEach((card) => {
+
     const active =
       card === closestCard;
 
@@ -210,19 +297,27 @@ function updateActiveModelCard() {
   });
 }
 
+
 let modelScrollFrame = null;
 
+
 function scheduleModelUpdate() {
+
   if (modelScrollFrame) {
     return;
   }
 
   modelScrollFrame =
     requestAnimationFrame(() => {
+
       updateActiveModelCard();
-      modelScrollFrame = null;
+
+      modelScrollFrame =
+        null;
+
     });
 }
+
 
 window.addEventListener(
   'scroll',
@@ -241,14 +336,18 @@ scheduleModelUpdate();
 
 
 // =============================================
-// GET INVOLVED CARD FLOWERS
+// GET INVOLVED CARDS
 // =============================================
 
 const involveCards = [
-  ...document.querySelectorAll('.involve-card')
+  ...document.querySelectorAll(
+    '.involve-card'
+  )
 ];
 
+
 involveCards.forEach((card) => {
+
   card.addEventListener(
     'mouseenter',
     () => startFlowerRain(card)
@@ -268,6 +367,7 @@ involveCards.forEach((card) => {
     'focusout',
     () => stopFlowerRain(card)
   );
+
 });
 
 
@@ -276,13 +376,18 @@ involveCards.forEach((card) => {
 // =============================================
 
 function updateActiveInvolveCard() {
-  if (
+
+  const mobileInteraction =
     window.matchMedia(
       '(hover: none), (pointer: coarse)'
-    ).matches === false
-  ) {
+    ).matches;
+
+  if (!mobileInteraction) {
+
     involveCards.forEach((card) => {
-      card.classList.remove('involve-active');
+      card.classList.remove(
+        'involve-active'
+      );
     });
 
     return;
@@ -295,28 +400,38 @@ function updateActiveInvolveCard() {
   let closestDistance = Infinity;
 
   involveCards.forEach((card) => {
+
     const rect =
       card.getBoundingClientRect();
 
     const cardCenter =
-      rect.top + rect.height / 2;
+      rect.top +
+      rect.height / 2;
 
     const distance =
       Math.abs(
-        cardCenter - viewportCenter
+        cardCenter -
+        viewportCenter
       );
 
     if (
       rect.bottom > 0 &&
-      rect.top < window.innerHeight &&
-      distance < closestDistance
+      rect.top <
+        window.innerHeight &&
+      distance <
+        closestDistance
     ) {
-      closestDistance = distance;
-      closestCard = card;
+
+      closestDistance =
+        distance;
+
+      closestCard =
+        card;
     }
   });
 
   involveCards.forEach((card) => {
+
     const active =
       card === closestCard;
 
@@ -333,19 +448,27 @@ function updateActiveInvolveCard() {
   });
 }
 
+
 let involveScrollFrame = null;
 
+
 function scheduleInvolveUpdate() {
+
   if (involveScrollFrame) {
     return;
   }
 
   involveScrollFrame =
     requestAnimationFrame(() => {
+
       updateActiveInvolveCard();
-      involveScrollFrame = null;
+
+      involveScrollFrame =
+        null;
+
     });
 }
+
 
 window.addEventListener(
   'scroll',
@@ -369,16 +492,21 @@ scheduleInvolveUpdate();
 
 document
   .querySelector('.back-to-top')
-  ?.addEventListener('click', () => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior:
-        reduced
-          ? 'auto'
-          : 'smooth'
-    });
-  });
+  ?.addEventListener(
+    'click',
+    () => {
+
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior:
+          reduced
+            ? 'auto'
+            : 'smooth'
+      });
+
+    }
+  );
 
 
 // =============================================
@@ -386,9 +514,13 @@ document
 // =============================================
 
 const impactStat =
-  document.querySelector('.impact-stat');
+  document.querySelector(
+    '.impact-stat'
+  );
+
 
 if (impactStat) {
+
   const number =
     impactStat.querySelector(
       '.impact-number'
@@ -396,20 +528,30 @@ if (impactStat) {
 
   const target =
     Number(
-      impactStat.dataset.count || 11
+      impactStat.dataset.count ||
+      11
     );
+
 
   if (
     reduced ||
-    !('IntersectionObserver' in window)
+    !(
+      'IntersectionObserver'
+      in window
+    )
   ) {
+
     if (number) {
-      number.textContent = target;
+      number.textContent =
+        target;
     }
+
   } else {
+
     const countObserver =
       new IntersectionObserver(
         ([entry]) => {
+
           if (
             !entry.isIntersecting ||
             !number
@@ -420,45 +562,63 @@ if (impactStat) {
           const start =
             performance.now();
 
-          const duration = 1100;
+          const duration =
+            1100;
 
-          const tick = (now) => {
-            const progress =
-              Math.min(
-                (now - start) /
-                duration,
-                1
-              );
 
-            const eased =
-              1 -
-              Math.pow(
-                1 - progress,
-                3
-              );
+          const tick =
+            (now) => {
 
-            number.textContent =
-              Math.max(
-                1,
-                Math.round(
-                  target * eased
-                )
-              );
+              const progress =
+                Math.min(
+                  (
+                    now -
+                    start
+                  ) /
+                  duration,
+                  1
+                );
 
-            if (progress < 1) {
-              requestAnimationFrame(
-                tick
-              );
-            }
-          };
+              const eased =
+                1 -
+                Math.pow(
+                  1 -
+                  progress,
+                  3
+                );
 
-          requestAnimationFrame(tick);
-          countObserver.disconnect();
+              number.textContent =
+                Math.max(
+                  1,
+                  Math.round(
+                    target *
+                    eased
+                  )
+                );
+
+              if (
+                progress < 1
+              ) {
+                requestAnimationFrame(
+                  tick
+                );
+              }
+            };
+
+
+          requestAnimationFrame(
+            tick
+          );
+
+          countObserver
+            .disconnect();
+
         },
         {
           threshold: 0.45
         }
       );
+
 
     countObserver.observe(
       impactStat
@@ -476,10 +636,21 @@ const galleryTrack =
     'community-gallery-track'
   );
 
+
+/*
+  IMPORTANT:
+
+  The element that actually scrolls
+  should be the parent of the track.
+
+  This avoids depending on a particular
+  class name in the HTML.
+*/
+
 const galleryScroller =
-  document.querySelector(
-    '.community-gallery'
-  );
+  galleryTrack?.parentElement ??
+  null;
+
 
 const lightbox =
   document.getElementById(
@@ -511,13 +682,54 @@ const lightboxNext =
     'gallery-lightbox-next'
   );
 
+
+// =============================================
+// COMMUNITY IMAGE DATA
+// =============================================
+
 const galleryImages =
-  Array.isArray(window.communityImages)
+  Array.isArray(
+    window.communityImages
+  )
     ? window.communityImages
     : [];
 
+
 let currentGalleryIndex = 0;
+
 let lastGalleryFocus = null;
+
+
+// =============================================
+// IMAGE PATH HELPERS
+// =============================================
+
+function getThumbnailPath(item) {
+
+  if (
+    typeof item === 'string'
+  ) {
+    return item;
+  }
+
+  return item?.thumb ||
+    item?.full ||
+    '';
+}
+
+
+function getFullImagePath(item) {
+
+  if (
+    typeof item === 'string'
+  ) {
+    return item;
+  }
+
+  return item?.full ||
+    item?.thumb ||
+    '';
+}
 
 
 // =============================================
@@ -525,57 +737,114 @@ let lastGalleryFocus = null;
 // =============================================
 
 function createGalleryItem(
-  imagePath,
+  imageData,
   index,
   duplicate = false
 ) {
-  const button =
-    document.createElement('button');
 
-  button.type = 'button';
+  const button =
+    document.createElement(
+      'button'
+    );
+
+  button.type =
+    'button';
+
   button.className =
     'community-gallery-item';
 
+
   if (duplicate) {
+
     button.tabIndex = -1;
 
     button.setAttribute(
       'aria-hidden',
       'true'
     );
+
   } else {
+
     button.setAttribute(
       'aria-label',
-      `View community photo ${index + 1}`
+      `View community photo ${
+        index + 1
+      }`
     );
+
   }
 
-  const image =
-    document.createElement('img');
 
-  image.src = imagePath;
+  const image =
+    document.createElement(
+      'img'
+    );
+
+
+  /*
+    Use optimized thumbnail in
+    scrolling gallery.
+  */
+
+  image.src =
+    getThumbnailPath(
+      imageData
+    );
+
 
   image.alt =
     duplicate
       ? ''
-      : `Global Maheela community photo ${index + 1}`;
+      : `Global Maheela community photo ${
+          index + 1
+        }`;
 
-  image.loading = 'eager';
-  image.decoding = 'async';
 
-  button.appendChild(image);
+  image.loading =
+    'eager';
+
+  image.decoding =
+    'async';
+
+  image.draggable =
+    false;
+
+
+  button.appendChild(
+    image
+  );
+
 
   if (!duplicate) {
+
     button.addEventListener(
       'click',
       () => {
+
+        /*
+          Do not open the lightbox if
+          this click was caused by
+          dragging the gallery.
+        */
+
+        if (
+          galleryDraggedDistance >
+          8
+        ) {
+          return;
+        }
+
+
         openGallery(
           index,
           button
         );
+
       }
     );
+
   }
+
 
   return button;
 }
@@ -586,20 +855,30 @@ function createGalleryItem(
 // =============================================
 
 function buildGallery() {
+
   if (!galleryTrack) {
     return;
   }
 
-  galleryTrack.innerHTML = '';
+
+  galleryTrack.innerHTML =
+    '';
+
 
   galleryTrack.classList.remove(
     'gallery-ready',
     'gallery-no-animation'
   );
 
-  if (galleryImages.length === 0) {
+
+  if (
+    galleryImages.length === 0
+  ) {
+
     const message =
-      document.createElement('p');
+      document.createElement(
+        'p'
+      );
 
     message.className =
       'gallery-empty';
@@ -607,9 +886,11 @@ function buildGallery() {
     message.textContent =
       'No community photos found.';
 
+
     galleryTrack.appendChild(
       message
     );
+
 
     galleryTrack.classList.add(
       'gallery-ready',
@@ -619,57 +900,94 @@ function buildGallery() {
     return;
   }
 
-  // First copy of all images.
+
+  /*
+    FIRST SET
+
+    These are the actual interactive
+    gallery images.
+  */
+
   galleryImages.forEach(
-    (imagePath, index) => {
+    (
+      imageData,
+      index
+    ) => {
+
       galleryTrack.appendChild(
         createGalleryItem(
-          imagePath,
+          imageData,
           index,
           false
         )
       );
+
     }
   );
 
-  /*
-    Add a second identical copy.
 
-    The duplicate set allows the
-    JavaScript auto-scroll to loop
-    without a visible jump.
+  /*
+    SECOND SET
+
+    Duplicate the images so the
+    auto-scroll can wrap seamlessly.
   */
+
   if (
     !reduced &&
     galleryImages.length > 1
   ) {
+
     galleryImages.forEach(
-      (imagePath, index) => {
+      (
+        imageData,
+        index
+      ) => {
+
         galleryTrack.appendChild(
           createGalleryItem(
-            imagePath,
+            imageData,
             index,
             true
           )
         );
+
       }
     );
+
   } else {
+
     galleryTrack.classList.add(
       'gallery-no-animation'
     );
+
   }
 }
 
 
 // =============================================
-// PRELOAD GALLERY IMAGES
+// PRELOAD IMAGE
 // =============================================
 
 function preloadImage(src) {
+
   return new Promise(
     (resolve) => {
-      const image = new Image();
+
+      if (!src) {
+
+        resolve({
+          src,
+          loaded: false
+        });
+
+        return;
+      }
+
+
+      const image =
+        new Image();
+
 
       image.onload =
         () => resolve({
@@ -677,32 +995,49 @@ function preloadImage(src) {
           loaded: true
         });
 
+
       image.onerror =
         () => resolve({
           src,
           loaded: false
         });
 
-      image.src = src;
+
+      image.src =
+        src;
+
     }
   );
 }
 
+
+// =============================================
+// PRELOAD GALLERY
+// =============================================
+
 async function preloadGalleryImages() {
+
   if (!galleryTrack) {
     return;
   }
+
 
   galleryTrack.classList.add(
     'gallery-loading'
   );
 
-  if (galleryImages.length === 0) {
+
+  if (
+    galleryImages.length === 0
+  ) {
+
     buildGallery();
+
 
     galleryTrack.classList.remove(
       'gallery-loading'
     );
+
 
     galleryTrack.classList.add(
       'gallery-ready'
@@ -711,38 +1046,77 @@ async function preloadGalleryImages() {
     return;
   }
 
+
+  /*
+    Only preload optimized thumbnails.
+
+    Full images load when a visitor
+    opens the lightbox.
+  */
+
   const results =
     await Promise.all(
       galleryImages.map(
-        (src) =>
-          preloadImage(src)
+        (imageData) =>
+          preloadImage(
+            getThumbnailPath(
+              imageData
+            )
+          )
       )
     );
 
-  results.forEach((result) => {
-    if (!result.loaded) {
-      console.warn(
-        'Community image failed to load:',
-        result.src
-      );
+
+  results.forEach(
+    (result) => {
+
+      if (!result.loaded) {
+
+        console.warn(
+          'Community image failed to load:',
+          result.src
+        );
+
+      }
+
     }
-  });
+  );
+
 
   buildGallery();
 
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      galleryTrack.classList.remove(
-        'gallery-loading'
+
+  /*
+    Let the browser calculate the
+    finished track dimensions before
+    starting the auto-scroll.
+  */
+
+  requestAnimationFrame(
+    () => {
+
+      requestAnimationFrame(
+        () => {
+
+          galleryTrack
+            .classList.remove(
+              'gallery-loading'
+            );
+
+
+          galleryTrack
+            .classList.add(
+              'gallery-ready'
+            );
+
+
+          startGalleryAutoScroll();
+
+        }
       );
 
-      galleryTrack.classList.add(
-        'gallery-ready'
-      );
-
-      startGalleryAutoScroll();
-    });
-  });
+    }
+  );
 }
 
 
@@ -750,79 +1124,133 @@ async function preloadGalleryImages() {
 // GALLERY AUTO SCROLL
 // =============================================
 
-let galleryAnimationFrame = null;
+let galleryAnimationFrame =
+  null;
 
-let galleryLastTimestamp = null;
+let galleryLastTimestamp =
+  null;
 
-let galleryInteractionPaused = false;
+let galleryInteractionPaused =
+  false;
 
-let galleryResumeTimer = null;
+let galleryResumeTimer =
+  null;
+
+
+/*
+  Pixels per second.
+
+  Increase this number if you want
+  the gallery to move faster.
+*/
 
 const GALLERY_SPEED = 32;
 
 
+// =============================================
+// LOOP WIDTH
+// =============================================
+
 function getGalleryLoopWidth() {
+
   if (!galleryTrack) {
     return 0;
   }
 
+
   /*
-    There are two identical sets of
-    images in the track, so half the
-    total track width is one complete
-    gallery set.
+    The gallery contains two identical
+    image sets.
+
+    Half the track width is therefore
+    one complete set.
   */
-  return galleryTrack.scrollWidth / 2;
+
+  return (
+    galleryTrack.scrollWidth /
+    2
+  );
 }
 
+
+// =============================================
+// AUTO SCROLL FRAME
+// =============================================
 
 function galleryAutoScrollStep(
   timestamp
 ) {
+
   if (
     !galleryScroller ||
     !galleryTrack ||
     reduced ||
     galleryImages.length < 2
   ) {
-    galleryAnimationFrame = null;
+
+    galleryAnimationFrame =
+      null;
+
     return;
   }
 
-  if (galleryLastTimestamp === null) {
-    galleryLastTimestamp = timestamp;
+
+  if (
+    galleryLastTimestamp ===
+    null
+  ) {
+
+    galleryLastTimestamp =
+      timestamp;
+
   }
+
 
   const elapsed =
     Math.min(
       timestamp -
-        galleryLastTimestamp,
+      galleryLastTimestamp,
       50
     );
+
 
   galleryLastTimestamp =
     timestamp;
 
-  if (!galleryInteractionPaused) {
+
+  if (
+    !galleryInteractionPaused
+  ) {
+
     const pixels =
       GALLERY_SPEED *
-      (elapsed / 1000);
+      (
+        elapsed /
+        1000
+      );
+
 
     galleryScroller.scrollLeft +=
       pixels;
 
+
     const loopWidth =
       getGalleryLoopWidth();
+
 
     if (
       loopWidth > 0 &&
       galleryScroller.scrollLeft >=
         loopWidth
     ) {
+
       galleryScroller.scrollLeft -=
         loopWidth;
+
     }
+
   }
+
 
   galleryAnimationFrame =
     requestAnimationFrame(
@@ -831,7 +1259,12 @@ function galleryAutoScrollStep(
 }
 
 
+// =============================================
+// START AUTO SCROLL
+// =============================================
+
 function startGalleryAutoScroll() {
+
   if (
     reduced ||
     !galleryScroller ||
@@ -841,13 +1274,21 @@ function startGalleryAutoScroll() {
     return;
   }
 
-  if (galleryAnimationFrame) {
+
+  if (
+    galleryAnimationFrame
+  ) {
+
     cancelAnimationFrame(
       galleryAnimationFrame
     );
+
   }
 
-  galleryLastTimestamp = null;
+
+  galleryLastTimestamp =
+    null;
+
 
   galleryAnimationFrame =
     requestAnimationFrame(
@@ -856,159 +1297,265 @@ function startGalleryAutoScroll() {
 }
 
 
+// =============================================
+// PAUSE AUTO SCROLL
+// =============================================
+
 function pauseGalleryAutoScroll() {
-  galleryInteractionPaused = true;
+
+  galleryInteractionPaused =
+    true;
+
 
   if (galleryResumeTimer) {
+
     clearTimeout(
       galleryResumeTimer
     );
 
-    galleryResumeTimer = null;
+    galleryResumeTimer =
+      null;
   }
 }
 
+
+// =============================================
+// RESUME AUTO SCROLL
+// =============================================
 
 function resumeGalleryAutoScroll(
   delay = 700
 ) {
+
   if (reduced) {
     return;
   }
 
+
   if (galleryResumeTimer) {
+
     clearTimeout(
       galleryResumeTimer
     );
+
   }
 
-  galleryResumeTimer =
-    setTimeout(() => {
-      galleryInteractionPaused =
-        false;
 
-      galleryLastTimestamp =
-        null;
-    }, delay);
+  galleryResumeTimer =
+    setTimeout(
+      () => {
+
+        galleryInteractionPaused =
+          false;
+
+        galleryLastTimestamp =
+          null;
+
+      },
+      delay
+    );
 }
 
 
 // =============================================
-// GALLERY TOUCH / POINTER INTERACTION
+// POINTER / TOUCH INTERACTION
 // =============================================
 
-galleryScroller?.addEventListener(
-  'pointerdown',
-  () => {
-    pauseGalleryAutoScroll();
+galleryScroller
+  ?.addEventListener(
+    'pointerdown',
+    () => {
 
-    galleryScroller.classList.add(
-      'is-dragging'
-    );
-  }
-);
+      pauseGalleryAutoScroll();
 
-galleryScroller?.addEventListener(
-  'pointerup',
-  () => {
-    galleryScroller.classList.remove(
-      'is-dragging'
-    );
+      galleryScroller
+        .classList.add(
+          'is-dragging'
+        );
 
-    resumeGalleryAutoScroll();
-  }
-);
+    }
+  );
 
-galleryScroller?.addEventListener(
-  'pointercancel',
-  () => {
-    galleryScroller.classList.remove(
-      'is-dragging'
-    );
 
-    resumeGalleryAutoScroll();
-  }
-);
+galleryScroller
+  ?.addEventListener(
+    'pointerup',
+    () => {
 
-galleryScroller?.addEventListener(
-  'pointerleave',
-  () => {
-    galleryScroller.classList.remove(
-      'is-dragging'
-    );
+      galleryScroller
+        .classList.remove(
+          'is-dragging'
+        );
 
-    resumeGalleryAutoScroll();
-  }
-);
+      resumeGalleryAutoScroll();
 
-galleryScroller?.addEventListener(
-  'touchstart',
-  pauseGalleryAutoScroll,
-  {
-    passive: true
-  }
-);
+    }
+  );
 
-galleryScroller?.addEventListener(
-  'touchend',
-  () => {
-    resumeGalleryAutoScroll();
-  },
-  {
-    passive: true
-  }
-);
 
-galleryScroller?.addEventListener(
-  'wheel',
-  () => {
-    pauseGalleryAutoScroll();
-    resumeGalleryAutoScroll(1000);
-  },
-  {
-    passive: true
-  }
-);
+galleryScroller
+  ?.addEventListener(
+    'pointercancel',
+    () => {
+
+      galleryScroller
+        .classList.remove(
+          'is-dragging'
+        );
+
+      resumeGalleryAutoScroll();
+
+    }
+  );
+
+
+galleryScroller
+  ?.addEventListener(
+    'pointerleave',
+    () => {
+
+      if (!galleryDragging) {
+
+        galleryScroller
+          .classList.remove(
+            'is-dragging'
+          );
+
+        resumeGalleryAutoScroll();
+
+      }
+
+    }
+  );
+
+
+galleryScroller
+  ?.addEventListener(
+    'touchstart',
+    () => {
+
+      pauseGalleryAutoScroll();
+
+    },
+    {
+      passive: true
+    }
+  );
+
+
+galleryScroller
+  ?.addEventListener(
+    'touchend',
+    () => {
+
+      resumeGalleryAutoScroll();
+
+    },
+    {
+      passive: true
+    }
+  );
+
+
+galleryScroller
+  ?.addEventListener(
+    'touchcancel',
+    () => {
+
+      resumeGalleryAutoScroll();
+
+    },
+    {
+      passive: true
+    }
+  );
+
+
+galleryScroller
+  ?.addEventListener(
+    'wheel',
+    () => {
+
+      pauseGalleryAutoScroll();
+
+      resumeGalleryAutoScroll(
+        1000
+      );
+
+    },
+    {
+      passive: true
+    }
+  );
 
 
 // =============================================
 // DESKTOP CLICK + DRAG
 // =============================================
 
-let galleryDragging = false;
+let galleryDragging =
+  false;
 
-let galleryDragStartX = 0;
+let galleryDragStartX =
+  0;
 
-let galleryDragStartScroll = 0;
+let galleryDragStartScroll =
+  0;
 
-let galleryDraggedDistance = 0;
+let galleryDraggedDistance =
+  0;
 
 
-galleryScroller?.addEventListener(
-  'mousedown',
-  (event) => {
-    galleryDragging = true;
+galleryScroller
+  ?.addEventListener(
+    'mousedown',
+    (event) => {
 
-    galleryDragStartX =
-      event.clientX;
+      /*
+        Only react to the main
+        mouse button.
+      */
 
-    galleryDragStartScroll =
-      galleryScroller.scrollLeft;
+      if (
+        event.button !== 0
+      ) {
+        return;
+      }
 
-    galleryDraggedDistance = 0;
 
-    pauseGalleryAutoScroll();
+      galleryDragging =
+        true;
 
-    galleryScroller.classList.add(
-      'is-dragging'
-    );
-  }
-);
+
+      galleryDragStartX =
+        event.clientX;
+
+
+      galleryDragStartScroll =
+        galleryScroller
+          .scrollLeft;
+
+
+      galleryDraggedDistance =
+        0;
+
+
+      pauseGalleryAutoScroll();
+
+
+      galleryScroller
+        .classList.add(
+          'is-dragging'
+        );
+
+    }
+  );
 
 
 window.addEventListener(
   'mousemove',
   (event) => {
+
     if (
       !galleryDragging ||
       !galleryScroller
@@ -1016,19 +1563,25 @@ window.addEventListener(
       return;
     }
 
+
     const distance =
       event.clientX -
       galleryDragStartX;
 
+
     galleryDraggedDistance =
       Math.max(
         galleryDraggedDistance,
-        Math.abs(distance)
+        Math.abs(
+          distance
+        )
       );
+
 
     galleryScroller.scrollLeft =
       galleryDragStartScroll -
       distance;
+
   }
 );
 
@@ -1036,45 +1589,66 @@ window.addEventListener(
 window.addEventListener(
   'mouseup',
   () => {
+
     if (!galleryDragging) {
       return;
     }
 
-    galleryDragging = false;
 
-    galleryScroller?.classList.remove(
-      'is-dragging'
-    );
+    galleryDragging =
+      false;
+
+
+    galleryScroller
+      ?.classList.remove(
+        'is-dragging'
+      );
+
 
     resumeGalleryAutoScroll();
+
   }
 );
 
 
-// Prevent accidental lightbox opening
-// after dragging the gallery.
-galleryTrack?.addEventListener(
-  'click',
-  (event) => {
-    if (galleryDraggedDistance > 8) {
-      event.preventDefault();
-      event.stopPropagation();
+// =============================================
+// PREVENT CLICK AFTER DRAG
+// =============================================
 
-      galleryDraggedDistance = 0;
-    }
-  },
-  true
-);
+galleryTrack
+  ?.addEventListener(
+    'click',
+    (event) => {
+
+      if (
+        galleryDraggedDistance >
+        8
+      ) {
+
+        event.preventDefault();
+
+        event.stopPropagation();
+
+
+        galleryDraggedDistance =
+          0;
+
+      }
+
+    },
+    true
+  );
 
 
 // =============================================
-// OPEN PHOTO
+// OPEN LIGHTBOX
 // =============================================
 
 function openGallery(
   index,
   trigger
 ) {
+
   if (
     !lightbox ||
     !lightboxImage ||
@@ -1083,33 +1657,47 @@ function openGallery(
     return;
   }
 
-  currentGalleryIndex = index;
-  lastGalleryFocus = trigger;
+
+  currentGalleryIndex =
+    index;
+
+
+  lastGalleryFocus =
+    trigger;
+
 
   updateGalleryLightbox();
 
-  lightbox.classList.add('open');
+
+  lightbox.classList.add(
+    'open'
+  );
+
 
   lightbox.setAttribute(
     'aria-hidden',
     'false'
   );
 
+
   document.body.classList.add(
     'gallery-open'
   );
 
+
   pauseGalleryAutoScroll();
+
 
   lightboxClose?.focus();
 }
 
 
 // =============================================
-// UPDATE LARGE PHOTO
+// UPDATE LIGHTBOX IMAGE
 // =============================================
 
 function updateGalleryLightbox() {
+
   if (
     !lightboxImage ||
     galleryImages.length === 0
@@ -1117,52 +1705,80 @@ function updateGalleryLightbox() {
     return;
   }
 
-  lightboxImage.src =
+
+  const imageData =
     galleryImages[
       currentGalleryIndex
     ];
+
+
+  /*
+    IMPORTANT:
+
+    Use the full-size optimized image
+    in the lightbox.
+  */
+
+  lightboxImage.src =
+    getFullImagePath(
+      imageData
+    );
+
 
   lightboxImage.alt =
     `Global Maheela community photo ${
       currentGalleryIndex + 1
     }`;
 
+
   if (lightboxCounter) {
+
     lightboxCounter.textContent =
       `${currentGalleryIndex + 1} / ${
         galleryImages.length
       }`;
+
   }
 }
 
 
 // =============================================
-// NEXT PHOTO
+// NEXT IMAGE
 // =============================================
 
 function nextGalleryImage() {
-  if (galleryImages.length === 0) {
+
+  if (
+    galleryImages.length === 0
+  ) {
     return;
   }
 
+
   currentGalleryIndex =
     (
-      currentGalleryIndex + 1
+      currentGalleryIndex +
+      1
     ) %
     galleryImages.length;
+
 
   updateGalleryLightbox();
 }
 
 
 // =============================================
-// PREVIOUS PHOTO
+// PREVIOUS IMAGE
 // =============================================
 
 function previousGalleryImage() {
-  if (galleryImages.length === 0) {
+
+  if (
+    galleryImages.length === 0
+  ) {
     return;
   }
+
 
   currentGalleryIndex =
     (
@@ -1172,42 +1788,64 @@ function previousGalleryImage() {
     ) %
     galleryImages.length;
 
+
   updateGalleryLightbox();
 }
 
 
 // =============================================
-// CLOSE PHOTO VIEWER
+// CLOSE LIGHTBOX
 // =============================================
 
 function closeGallery() {
+
   if (!lightbox) {
     return;
   }
 
-  lightbox.classList.remove('open');
+
+  lightbox.classList.remove(
+    'open'
+  );
+
 
   lightbox.setAttribute(
     'aria-hidden',
     'true'
   );
 
+
   document.body.classList.remove(
     'gallery-open'
   );
 
+
   if (lightboxImage) {
-    lightboxImage.src = '';
+
+    lightboxImage.src =
+      '';
+
   }
+
 
   if (
-    lastGalleryFocus instanceof
-      HTMLElement
+    lastGalleryFocus
+    instanceof HTMLElement
   ) {
+
     lastGalleryFocus.focus();
+
   }
 
-  resumeGalleryAutoScroll(300);
+
+  /*
+    Resume the moving gallery shortly
+    after the lightbox closes.
+  */
+
+  resumeGalleryAutoScroll(
+    300
+  );
 }
 
 
@@ -1215,62 +1853,95 @@ function closeGallery() {
 // LIGHTBOX BUTTONS
 // =============================================
 
-lightboxClose?.addEventListener(
-  'click',
-  closeGallery
-);
+lightboxClose
+  ?.addEventListener(
+    'click',
+    closeGallery
+  );
 
-lightboxPrevious?.addEventListener(
-  'click',
-  previousGalleryImage
-);
 
-lightboxNext?.addEventListener(
-  'click',
-  nextGalleryImage
-);
+lightboxPrevious
+  ?.addEventListener(
+    'click',
+    previousGalleryImage
+  );
+
+
+lightboxNext
+  ?.addEventListener(
+    'click',
+    nextGalleryImage
+  );
 
 
 // =============================================
 // CLICK BACKGROUND TO CLOSE
 // =============================================
 
-lightbox?.addEventListener(
-  'click',
-  (event) => {
-    if (event.target === lightbox) {
-      closeGallery();
+lightbox
+  ?.addEventListener(
+    'click',
+    (event) => {
+
+      if (
+        event.target ===
+        lightbox
+      ) {
+
+        closeGallery();
+
+      }
+
     }
-  }
-);
+  );
 
 
 // =============================================
-// KEYBOARD CONTROLS
+// KEYBOARD LIGHTBOX CONTROLS
 // =============================================
 
 document.addEventListener(
   'keydown',
   (event) => {
+
     if (
-      !lightbox?.classList.contains(
-        'open'
-      )
+      !lightbox
+        ?.classList
+        .contains('open')
     ) {
       return;
     }
 
-    if (event.key === 'Escape') {
+
+    if (
+      event.key ===
+      'Escape'
+    ) {
+
       closeGallery();
+
     }
 
-    if (event.key === 'ArrowRight') {
+
+    if (
+      event.key ===
+      'ArrowRight'
+    ) {
+
       nextGalleryImage();
+
     }
 
-    if (event.key === 'ArrowLeft') {
+
+    if (
+      event.key ===
+      'ArrowLeft'
+    ) {
+
       previousGalleryImage();
+
     }
+
   }
 );
 
@@ -1284,18 +1955,27 @@ const emailButton =
     'email-global-maheela'
   );
 
-emailButton?.addEventListener(
-  'click',
-  (event) => {
-    event.preventDefault();
 
-    const user = 'globalmaheela';
-    const domain = 'gmail.com';
+emailButton
+  ?.addEventListener(
+    'click',
+    (event) => {
 
-    window.location.href =
-      `mailto:${user}@${domain}`;
-  }
-);
+      event.preventDefault();
+
+
+      const user =
+        'globalmaheela';
+
+      const domain =
+        'gmail.com';
+
+
+      window.location.href =
+        `mailto:${user}@${domain}`;
+
+    }
+  );
 
 
 // =============================================
