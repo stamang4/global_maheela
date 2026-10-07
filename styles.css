@@ -3411,3 +3411,155 @@ html { overflow-x: clip; }
 @media (prefers-reduced-motion: reduce) {
   .involve-card { transition: none; }
 }
+/* =========================================================
+   FINAL LAYOUT + MOBILE WIDTH + GALLERY MOTION OVERRIDES
+   ========================================================= */
+
+/* Normal content sections should size to their content, not a full viewport. */
+main > section.section-pad,
+main > section.section-pad:not(.gallery) {
+  min-height: 0 !important;
+  height: auto !important;
+  padding-block: clamp(64px, 6vw, 88px) !important;
+}
+
+/* Keep headings comfortably separated without creating large empty areas. */
+main > section.section-pad .section-heading {
+  margin-bottom: clamp(24px, 3vw, 40px) !important;
+}
+
+/* Keep the hero intentionally spacious; this is the only section allowed
+   to use most of the initial viewport. */
+.hero {
+  height: auto !important;
+  min-height: calc(100dvh - 88px) !important;
+}
+
+/* Full viewport canvas with safe inner gutters. */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: clip;
+}
+
+img,
+video,
+svg {
+  max-width: 100%;
+}
+
+@media (max-width: 900px) {
+  main > section.section-pad,
+  main > section.section-pad:not(.gallery) {
+    padding-block: 64px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Use the entire phone viewport while preserving readable inner padding. */
+  .shell {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: 0 !important;
+    padding-inline: 18px !important;
+  }
+
+  main > section.section-pad,
+  main > section.section-pad:not(.gallery) {
+    min-height: 0 !important;
+    height: auto !important;
+    padding-block: 52px !important;
+  }
+
+  main > section.section-pad .section-heading {
+    margin-bottom: 28px !important;
+  }
+
+  /* Hero should flow naturally on a phone rather than forcing a full screen. */
+  .hero {
+    min-height: 0 !important;
+    height: auto !important;
+    padding-block: 38px 52px !important;
+  }
+}
+
+/* ---------------------------------------------------------
+   COMMUNITY GALLERY — AUTOMATIC CONTINUOUS SCROLL
+   --------------------------------------------------------- */
+
+.community-gallery {
+  width: 100%;
+  overflow: hidden !important;
+  min-height: 0;
+  cursor: grab;
+  mask-image: none !important;
+  -webkit-mask-image: none !important;
+}
+
+.community-gallery-track,
+.community-gallery-track.gallery-loading,
+.community-gallery-track.gallery-ready {
+  display: flex;
+  width: max-content;
+  opacity: 1;
+  visibility: visible;
+  will-change: transform;
+}
+
+/* Override the older rules that disabled the marquee.
+   The duplicated image set in the track makes this loop seamless. */
+.community-gallery-track.gallery-ready:not(.gallery-no-animation) {
+  animation: galleryMove 180s linear infinite !important;
+}
+
+@keyframes galleryMove {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* Desktop users can pause long enough to select a photo. */
+@media (hover: hover) and (pointer: fine) {
+  .community-gallery:hover .community-gallery-track.gallery-ready:not(.gallery-no-animation) {
+    animation-play-state: paused;
+  }
+}
+
+/* Phones/tablets also auto-scroll; no hover or tap is required. */
+@media (max-width: 600px) {
+  .community-gallery {
+    overflow: hidden !important;
+    touch-action: pan-y;
+  }
+
+  .community-gallery-track.gallery-ready:not(.gallery-no-animation) {
+    animation: galleryMove 145s linear infinite !important;
+  }
+
+  .community-gallery-item {
+    width: min(76vw, 300px);
+    flex-shrink: 0;
+  }
+}
+
+/* Respect the OS accessibility setting. The gallery remains visible and
+   usable, but continuous motion is stopped when Reduce Motion is requested. */
+@media (prefers-reduced-motion: reduce) {
+  .community-gallery {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+  }
+
+  .community-gallery-track.gallery-ready,
+  .community-gallery-track.gallery-ready:not(.gallery-no-animation) {
+    animation: none !important;
+    transform: none !important;
+  }
+}
