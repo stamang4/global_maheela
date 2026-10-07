@@ -3671,3 +3671,66 @@ svg {
     transform: none !important;
   }
 }
+
+/* =========================================================
+   FINAL MARKET SPACING + JS-DRIVEN GALLERY SCROLL
+   ========================================================= */
+
+/* Keep the marketplace section compact and balanced. */
+.market.section-pad {
+  padding-block: clamp(44px, 5vw, 68px) !important;
+}
+
+.market-card {
+  padding: clamp(34px, 4vw, 48px) !important;
+  gap: clamp(30px, 4vw, 52px) !important;
+  align-items: center !important;
+}
+
+.market-card > div:first-child > p:last-of-type {
+  margin-bottom: 18px;
+}
+
+@media (max-width: 900px) {
+  .market.section-pad {
+    padding-block: 48px !important;
+  }
+
+  .market-card {
+    grid-template-columns: 1fr !important;
+    padding: 34px 28px !important;
+    gap: 28px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .market.section-pad {
+    padding-block: 38px !important;
+  }
+
+  .market-card {
+    padding: 28px 20px !important;
+    border-radius: 24px !important;
+  }
+}
+
+/* Gallery movement is controlled by script.js so automatic movement and
+   manual swipe/drag can coexist without competing CSS transforms. */
+.community-gallery-track.gallery-ready,
+.community-gallery-track.gallery-ready:not(.gallery-no-animation) {
+  animation: none !important;
+  transform: none !important;
+}
+
+.community-gallery {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scroll-behavior: auto !important;
+  touch-action: pan-x pan-y !important;
+  cursor: grab;
+}
+
+.community-gallery.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
